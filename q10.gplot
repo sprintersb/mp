@@ -1,0 +1,34 @@
+Data = "q10.data"
+
+Form = "svg"
+
+call "size.gplot" Data
+
+#set xrange [min_x:max_x]
+#set x2range [min_x:max_x]
+
+# Enhanced allows TeX-like x^{12} and a_i in titles / keys. 
+set terminal Form size 820,500 enhanced
+set output "q10." . Form
+#set multiplot
+
+set lmargin 10
+
+#if (size_x < 20) set xtics axis min_x, 1 # Start and offset
+
+#set size 0.5, 0.5
+#set origin 0.5, 0.5
+
+set ytics  textcolor rgb "#dd3333" nomirror
+set y2tics textcolor rgb "#888888" nomirror
+
+#set key reverse outside Left
+set key top center reverse Left
+set key autotitle columnheader
+set pointsize 1.0 / max_x
+
+plot [min_x-1 : max_x+0.5] \
+	Data using 1:2 with linespoints pt 7 lc rgb "#dd3333" axes x1y1, \
+	Data using 1:3 lc rgb "#888888" lw 1 with lines axes x1y2
+
+#plot [-1:*] "q10.data" using 1:4 lc "#000000" with lines

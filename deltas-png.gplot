@@ -1,0 +1,33 @@
+# show yrange
+# set yrange [*:*] noreverse nowriteback
+# gnuplot -e "a=1"  =>  exists("a") && a = 1 
+
+if (!exists("base")) base = "deltas"
+if (!exists("color")) color = "#dd3333"
+
+data = base . ".data"
+outfile = base . ".png"
+
+# Dummy plot to get statistical properties without having "stats" command. Sets: 
+# size_x, min_x, max_x
+# size_y, min_y, max_y
+
+call "size.gplot" data
+
+x0 = min_x - 0.02 * size_x;
+x1 = max_x + 0.02 * size_x;
+y0 = min_y - 0.03 * size_y;
+y1 = max_y + 0.1 * size_y;
+
+set terminal png size 820,500
+set output outfile
+firstrow = system('head -1 '.data)
+txt = firstrow
+
+set yrange [y0 : y1] noreverse nowriteback
+
+set key horizontal
+set key autotitle columnheader
+
+plot [x0 : x1] \
+    data using 1:2 with impulses lc rgb color

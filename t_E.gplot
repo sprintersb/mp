@@ -1,0 +1,9 @@
+set terminal svg size 820,500
+set output "t_E.svg"
+set multiplot
+
+data = "t_E.data"
+txt = ""
+plot [-0.1:1.1] data using 1:2 with impulses title txt
+plot [-0.1:1.1] data using 1:2 with points title txt
+plot [-0.1:1.1] data using 1:3 lc "#000000" with lines title txt

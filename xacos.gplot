@@ -1,0 +1,65 @@
+# show yrange
+# set yrange [*:*] noreverse nowriteback
+# gnuplot -e "a=1"  =>  exists(a) && a = 1 
+
+if (!exists("base")) base = "xacos"
+
+data = base . ".data"
+outfile = base . ".svg"
+
+# Dummy plot to get statistical properties without having "stats" command. Sets: 
+# size_x, min_x, max_x
+# size_y, min_y, max_y
+
+call "size.gplot" data
+
+x0 = min_x - 0.02 * size_x;
+x1 = max_x + 0.02 * size_x;
+y0 = min_y - 0.02 * size_y;
+y1 = max_y + 0.1 * size_y;
+
+#set multiplot
+#plot [-4:4] exp(-x**2 / 2)
+
+#c(x) = 1.0/2 - cos (pi*x/6)/2
+# txt = "a(x) = p(x) / q(x)                      (sqrt(2-2x)·a(1-x) - acos(x)) / acos(x)"
+#txt = "a(x) = x·p(x²)                         (a(x) - sin(x)) / sin(x)"
+
+set terminal svg size 820,500
+set output outfile
+txt = "Xacos"
+
+set multiplot title txt
+
+set yrange [y0 : y1] noreverse nowriteback
+plot [x0 : x1] data u 1:3 volatile lc rgb "#000000" lw 6 with lines title "" 
+
+plot [x0 : x1] data u 1:2 volatile lc rgb "#ffdd00" with lines title ""
+
+
+quit
+
+a = 0.25
+f(x) = (x + a*x*x) / (1 + a)
+plot  "xmax_6.data", "xmax_3_3.data", 0.5-cos(pi*f(x/7))/2 with lines
+#plot  "xmax_7.data", "xmax_5_2.data", "xmax_4_3.data", "xmax_3_4.data", "xmax_2_5.data", 0.5-cos(pi*f(x/7))/2 with lines
+
+quit
+
+plot "gplot-asin.data" volatile with lines \
+    title  "g(x) = p(x) / q(x)                                    (x*g(2*x*x) - asin(x)) / asin(x)" \
+    , "gplot-acos.data" volatile with lines \
+    title  "(sqrt(2*x)*g(x) - acos(1-x)) / acos(1-x)" \
+
+
+quit
+
+w(x) = sqrt(x)
+a(x) = atan(w(x)) / w(x)
+
+p(x) = 1.00000000000000021860053635744163681753 + 1.71711698967745598711491909664531080816*x + 0.892192639526984886118703086198960598482*x**2 + 0.141476084218282497677800686318216518215*x**3 + 0.00325296969214277854244341972335100579624*x**4
+q(x) = 1 + 2.05045032301080521264355855576504590279*x + 1.37567608053367914637398597728846726768*x**2 + 0.332801855752360858005830005477738579967*x**3 + 0.0208620753065006505280284836123028848998*x**4
+f(x) = p(x) / q(x)
+
+plot [0:0.278] (f(x) - a(x)) / a(x)
+quit
