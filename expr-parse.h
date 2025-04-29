@@ -157,6 +157,8 @@ public:
             Gamma (x)               Gamma Function
             gd (x)                  Gudermann's Function
 
+            asinq (x)               asin(sqrt(x)) / sqrt(x)
+
        Two or more Arguments
             pow (x, y)              Power x ^ y
             atan2 (y, x)            The argument of complex number x + y * I

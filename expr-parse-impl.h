@@ -1109,6 +1109,16 @@ void ExpressionParser<F>::Lexer::init_ident()
         return ::ldexp (y, 1);
     });
 
+    set ("asinq", [] (Farg x) -> F // asin(sqrt(x)) / sqrt(x)
+    {
+        if (x * x == 0)
+            return F{1} + x / F{6};
+        F q = ::sqrt (::fabs (x));
+        return x > 0
+            ? ::asin (q) / q
+            : ::asinh (q) / q;
+    });
+
     // These functions actually have exactly 1 argument: a "," pack.
     set (2, "pow",   &Token::pow);
     set (2, "atan2", &Token::atan2);
