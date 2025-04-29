@@ -161,6 +161,7 @@ public:
             cosq (x)                cos(sqrt(x))
             asinq (x)               asin(sqrt(x)) / sqrt(x)
             atanq (x)               atan(sqrt(x)) / sqrt(x)
+            artanhq (x)             artanh(sqrt(x)) / sqrt(x) = atanq (-x)
 
        Two or more Arguments
             pow (x, y)              Power x ^ y
