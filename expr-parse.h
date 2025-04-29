@@ -159,6 +159,7 @@ public:
 
             sinq (x)                sin(sqrt(x)) / sqrt(x)
             asinq (x)               asin(sqrt(x)) / sqrt(x)
+            atanq (x)               atan(sqrt(x)) / sqrt(x)
 
        Two or more Arguments
             pow (x, y)              Power x ^ y
