@@ -158,6 +158,7 @@ public:
             gd (x)                  Gudermann's Function
 
             sinq (x)                sin(sqrt(x)) / sqrt(x)
+            cosq (x)                cos(sqrt(x))
             asinq (x)               asin(sqrt(x)) / sqrt(x)
             atanq (x)               atan(sqrt(x)) / sqrt(x)
 

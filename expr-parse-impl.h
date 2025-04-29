@@ -1119,6 +1119,12 @@ void ExpressionParser<F>::Lexer::init_ident()
             : ::sinh (q) / q;
     });
 
+    set ("cosq", [] (Farg x) -> F // cos(sqrt(x))
+    {
+        F q = ::sqrt (::fabs (x));
+        return x >= 0 ? ::cos (q) : ::cosh (q);
+    });
+
     set ("asinq", [] (Farg x) -> F // asin(sqrt(x)) / sqrt(x)
     {
         if (x * x == 0)
