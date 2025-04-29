@@ -1109,6 +1109,16 @@ void ExpressionParser<F>::Lexer::init_ident()
         return ::ldexp (y, 1);
     });
 
+    set ("sinq", [] (Farg x) -> F // sin(sqrt(x)) / sqrt(x)
+    {
+        if (x * x == 0)
+            return F{1} - x / F{6};
+        F q = ::sqrt (::fabs (x));
+        return x > 0
+            ? ::sin (q) / q
+            : ::sinh (q) / q;
+    });
+
     set ("asinq", [] (Farg x) -> F // asin(sqrt(x)) / sqrt(x)
     {
         if (x * x == 0)

@@ -157,6 +157,7 @@ public:
             Gamma (x)               Gamma Function
             gd (x)                  Gudermann's Function
 
+            sinq (x)                sin(sqrt(x)) / sqrt(x)
             asinq (x)               asin(sqrt(x)) / sqrt(x)
 
        Two or more Arguments
