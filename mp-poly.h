@@ -172,7 +172,7 @@ public:
         HTML, HTMLDown, HTMLMinus, HTMLMinusDown, // Minus: --> "&minus;"
         TeX, TeXDown, TeXFrac, TeXFracDown, Text, TextDown,
         Python, PythonHorner, PythonHornerPow, CHorner, Desmos, DesmosDown,
-        VHDLTab, FLT40tab,
+        VHDLTab, FLT40tab, FLT40tabMonic,
         // Only lists following.  The string argument of print() is printed
         // as separator between the list elements.  If the string looks like
         // "L@R|S", then
@@ -208,7 +208,7 @@ public:
 private:
     std::ostream& print_horner (std::ostream&, Style, const char*, int, const char*, const char*) const;
     std::ostream& print_VHDLtab (std::ostream&, const char*, int prec2 = 0) const;
-    std::ostream& print_FLT40tab (std::ostream&, const char* = nullptr) const;
+    std::ostream& print_FLT40tab (std::ostream&, bool monic = false, const char* = nullptr) const;
 };
 
 // Just for a test Eval Poly<Float> at RatioalFunction<Float>

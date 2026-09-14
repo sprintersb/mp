@@ -312,14 +312,20 @@ namespace
     void _print<Float> (std::ostream& ost, const Float& a0, int prec2,
                         Poly<Float>::Style style)
     {
+        using S = Poly<Float>::Style;
+
         char *str = nullptr;
 
         Float a;
         a.copy (a0);
-        if (prec2 > 0)
+        if (prec2 > 0
+            // These styles round themselves (they encode one bit more).
+            && style != S::FLT40tab
+            && style != S::FLT40tabMonic)
+        {
             a.set_precision_round (prec2, MPFR_RNDN);
+        }
 
-        using S = Poly<Float>::Style;
         switch (style)
         {
             default:
@@ -398,6 +404,7 @@ namespace
             // an encoded mantissa of prec2 bits.  This is used in
             // math lookup tables in AVR-LibC.
             case S::FLT40tab:
+            case S::FLT40tabMonic:
             {
                 const int n_expo = 8;
                 const int n_bits = 1 + n_expo + prec2;
@@ -705,22 +712,38 @@ void Poly<A>::print_VHDL_Table (std::ostream& ost, const char *var,
     .byte   0xab,0xaa,0xaa,0x2a,0x3e    ; 1/6
     .byte   0x00,0x00,0x00,0x80,0x3f    ; 1
 
-   Coefficient [0] comes last.  */
+   Coefficient [0] comes last.
+
+   If monic, print as
+    .byte   -2                          ; 1.0000
+    .byte        0xaa,0xaa,0x2a,0x3e    ; 1/6
+    .byte   0x00,0x00,0x00,0x80,0x3f    ; 1
+*/
 template<class A>
-std::ostream& Poly<A>::print_FLT40tab (std::ostream& ost,
+std::ostream& Poly<A>::print_FLT40tab (std::ostream& ost, bool monic,
                                        const char* start) const
 {
     if (! start)
         start = "\t.byte\t";
 
-    ost << start << deg_ << std::endl;
+    if (monic)
+    {
+        const A _1 = Scalar::one();
+        monic = deg_ > 0 && fabs (at(deg_) - _1) < ldexp (_1, -25);
+    }
 
-    for (int i = deg_; i >= 0; --i)
+    if (monic)
+        ost << start << (-deg_) << "\t\t\t\t;  1.0000000000" << std::endl;
+    else
+        ost << start << deg_ << std::endl;
+
+    const int top = deg_ - monic;
+    for (int i = top; i >= 0; --i)
     {
         A ai = at(i);
 
-        ost << start << (i == deg_ ? "     " : "");
-        _print<A> (ost, ai, i == deg_ ? 23 : 31, FLT40tab);
+        ost << start << (i == top ? "     " : "");
+        _print<A> (ost, ai, i == top ? 23 : 31, FLT40tab);
         char cmt[30];
         sprintf (cmt, "\t; % .10f", (double) ai);
 
@@ -792,8 +815,8 @@ std::ostream& Poly<A>::print (std::ostream& ost, Style style, const char* txt,
         return print_horner (ost, style, var, prec2, l, r);
     else if (style == VHDLTab)
         return print_VHDLtab (ost, txt, prec2);
-    else if (style == FLT40tab)
-        return print_FLT40tab (ost, txt);
+    else if (style == FLT40tab || style == FLT40tabMonic)
+        return print_FLT40tab (ost, style == FLT40tabMonic, txt);
 
     const char* const times = 0?0
         : isTeX ? " "
