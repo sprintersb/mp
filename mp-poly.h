@@ -189,6 +189,7 @@ public:
         // the 2nd-highest coefficient.
         ListF7, ListF7Normalized,
         ListDoubleX64, ListFloatX32,
+        ListFP64Lib, ListFP64LibMonic,
         ListVHDLFloatX32
     };
     // If VAR is like "L@R|S", then:
@@ -209,6 +210,7 @@ private:
     std::ostream& print_horner (std::ostream&, Style, const char*, int, const char*, const char*) const;
     std::ostream& print_VHDLtab (std::ostream&, const char*, int prec2 = 0) const;
     std::ostream& print_FLT40tab (std::ostream&, bool monic = false, const char* = nullptr) const;
+    std::ostream& print_ListFP64Lib (std::ostream&, bool monic = false) const;
 };
 
 // Just for a test Eval Poly<Float> at RatioalFunction<Float>

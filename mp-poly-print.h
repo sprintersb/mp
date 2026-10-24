@@ -307,6 +307,7 @@ namespace
     }
 
     int _f7_extra_flag = 0;
+    int _fp64_extra_flag = 0;
 
     template<>
     void _print<Float> (std::ostream& ost, const Float& a0, int prec2,
@@ -396,6 +397,32 @@ namespace
                     str = str2;
                 }
                 my_asprintf (&str, "%s %d", str2, expo);
+                std::free (str2);
+                break;
+            }
+
+            case S::ListFP64Lib:
+            case S::ListFP64LibMonic:
+            {
+                char *str2;
+                int n_bytes = 7;
+                int expo, bytes[n_bytes];
+                int flag = a.as_bytes (n_bytes, bytes, &expo);
+                int b7 = (flag ? 0x80 : 0x00) | _fp64_extra_flag /*monic*/; 
+                if (b7 == 0 || b7 == 0x80 || b7 == 1 || b7 == 0x81)
+                    my_asprintf (&str, "0x%02x, ", b7);
+                else
+                    my_asprintf (&str, "???0x%02x, ", b7);
+                for (int i = 0; i < n_bytes; ++i)
+                {
+                    my_asprintf (&str2, "%s0x%02x,", str, bytes[i]);
+                    std::free (str);
+                    str = str2;
+                }
+                expo += 1023;
+                uint8_t xhi = (uint16_t) expo >> 8;
+                uint8_t xlo = (uint8_t) expo;
+                my_asprintf (&str, "%s 0x%02x,0x%02x", str2, xhi, xlo);
                 std::free (str2);
                 break;
             }
@@ -753,6 +780,45 @@ std::ostream& Poly<A>::print_FLT40tab (std::ostream& ost, bool monic,
     return ost;
 }
 
+
+template<class A>
+std::ostream& Poly<A>::print_ListFP64Lib (std::ostream& ost, bool monic) const
+{
+    const char *start = "\t.byte ";
+
+    if (monic)
+    {
+        const A _1 = Scalar::one();
+        monic = deg_ > 0 && fabs (at(deg_) - _1) < ldexp (_1, -56);
+    }
+
+    ost << start << deg_ << (monic ? " ; monic" : "") << std::endl;
+
+    const int top = deg_ - monic;
+    for (int i = top; i >= 0; --i)
+    {
+        A ai = at(i);
+
+        Float a;
+        a.copy (ai);
+        a.set_precision_round (56, MPFR_RNDN);
+
+        ost << start;
+        _fp64_extra_flag = monic;
+        _print<A> (ost, ai, 56, ListFP64Lib);
+        monic = false;
+        char cmt[100];
+        mpfr_sprintf (cmt, " ; %+.20RNe", a.mpfr());
+        ost << cmt;
+        mpfr_sprintf (cmt, " = %+.14RNa", a.mpfr());
+        ost << cmt;
+        ost << std::endl;
+    }
+
+    return ost;
+}
+
+
 template<class A>
 std::ostream& Poly<A>::print (std::ostream& ost, Style style, const char* txt,
                               int prec2) const
@@ -773,7 +839,8 @@ std::ostream& Poly<A>::print (std::ostream& ost, Style style, const char* txt,
         { horner,   { GnuplotHorner, PythonHorner, PythonHornerPow, CHorner } },
         { nosplit,  { None } },
         { down,     { TeXDown, TeXFracDown, GnuplotDown, HTMLDown, TextDown,
-              HTMLMinusDown, DesmosDown, ListDoubleDown } },
+                      HTMLMinusDown, DesmosDown, ListDoubleDown,
+                      ListFP64Lib, ListFP64LibMonic } },
         { todo,     { } },
     };
     for (auto& t : ts)
@@ -817,6 +884,8 @@ std::ostream& Poly<A>::print (std::ostream& ost, Style style, const char* txt,
         return print_VHDLtab (ost, txt, prec2);
     else if (style == FLT40tab || style == FLT40tabMonic)
         return print_FLT40tab (ost, style == FLT40tabMonic, txt);
+    else if (style == ListFP64Lib || style == ListFP64LibMonic)
+        return print_ListFP64Lib (ost, style == ListFP64LibMonic);
 
     const char* const times = 0?0
         : isTeX ? " "
