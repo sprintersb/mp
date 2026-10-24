@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 /* Set to a function like gmp_vfprintf from <gmp.h> to support "%Zd"
    to print mpz_t.  Or set to mpfr_vfprintf from <mpfr.h> to support "%RNf"
