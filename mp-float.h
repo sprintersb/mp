@@ -230,6 +230,7 @@ public:
     Float pow (const Float&) const;
     Float root (unsigned long) const;
     Float atan2 (const Float&) const;
+    Float hypot (const Float&) const;
     Float min (const Float&) const;
     Float max (const Float&) const;
     Float fmod (const Float&) const;
@@ -288,6 +289,7 @@ public:
     Float NAME (const Float&, const Float&);
     MK_OP (pow)
     MK_OP (atan2)
+    MK_OP (hypot)
     MK_OP (fmin)
     MK_OP (fmax)
     MK_OP (fmod)
